@@ -6,16 +6,18 @@ import java.sql.SQLException;
 
 public class DatabaseConfig {
 
+    // Connection parameters
     private static final String DB_URL = "jdbc:postgresql://localhost:5432/seb_db";
     private static final String DB_USER = "webserver";
     private static final String DB_PASSWORD = "webserver";
 
-    // Ensures that only one instance of DatabaseConfig exist (Singleton)
+    // Declaration of static variable "instance" (of type DatabaseConfig)
+    // to store instance of DatabaseConfig
     private static DatabaseConfig instance;
 
+    // Load PostgreSQL driver in memory
     private DatabaseConfig() {
         try {
-            // Load postgreSQL driver
             Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
             System.err.println("PostgreSQL driver not found");
@@ -24,7 +26,8 @@ public class DatabaseConfig {
         }
     }
 
-    // Ensures that only one instance of DatabaseConfig exist (Singleton)
+    // Returns "instance" of type DatabaseConfig
+    // "synchronized" ensures that only one instance of DatabaseConfig exist (Singleton)
     public static synchronized DatabaseConfig getInstance() {
         if (instance == null) {
             instance = new DatabaseConfig();
@@ -32,10 +35,12 @@ public class DatabaseConfig {
         return instance;
     }
 
+    // Creates and returns new connection do DB
     public Connection getConnection() throws SQLException {
         return DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
     }
 
+    // Safely close connection
     public void closeConnection(Connection connection) {
         if (connection != null) {
             try {
@@ -51,7 +56,7 @@ public class DatabaseConfig {
         Connection connection = null;
         try {
             connection = getConnection();
-            return connection.isValid(5); // Test if connection is valid with 5-second timeout
+            return connection.isValid(5); // Test with 5-second timeout
         } catch (SQLException e) {
             System.err.println("Database connection test failed");
             e.printStackTrace();
