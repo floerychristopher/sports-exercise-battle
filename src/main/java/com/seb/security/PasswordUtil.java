@@ -7,22 +7,20 @@ import java.util.Base64;
 
 public class PasswordUtil {
 
-    /**
-     * Hash a password with a generated salt
-     */
+    // Hash password with salt
     public static String hashPassword(String password) {
         try {
-            // Generate a random salt
+            // Generate random salt
             SecureRandom random = new SecureRandom();
             byte[] salt = new byte[16];
             random.nextBytes(salt);
 
-            // Hash the password with the salt
+            // Hash password with salt
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             md.update(salt);
             byte[] hashedPassword = md.digest(password.getBytes());
 
-            // Store both salt and hashed password
+            // Store salt and hashed password
             String saltBase64 = Base64.getEncoder().encodeToString(salt);
             String hashBase64 = Base64.getEncoder().encodeToString(hashedPassword);
 
@@ -32,9 +30,7 @@ public class PasswordUtil {
         }
     }
 
-    /**
-     * Verify a password against a stored hash
-     */
+    // Verify password against stored hash
     public static boolean verifyPassword(String password, String storedHash) {
         try {
             // Split into salt and hash
@@ -46,12 +42,12 @@ public class PasswordUtil {
             byte[] salt = Base64.getDecoder().decode(parts[0]);
             byte[] hash = Base64.getDecoder().decode(parts[1]);
 
-            // Hash the provided password with the same salt
+            // Hash provided password with same salt
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             md.update(salt);
             byte[] passwordHash = md.digest(password.getBytes());
 
-            // Compare the hashes
+            // Compare hashes
             return MessageDigest.isEqual(hash, passwordHash);
         } catch (NoSuchAlgorithmException | IllegalArgumentException e) {
             return false;

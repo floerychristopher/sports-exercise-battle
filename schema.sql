@@ -51,6 +51,14 @@ CREATE TABLE logs (
     log_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Streaks table for unique feature
+CREATE TABLE user_streaks (
+    user_id INTEGER PRIMARY KEY REFERENCES users(user_id) ON DELETE CASCADE,
+    current_streak INTEGER DEFAULT 0,
+    longest_streak INTEGER DEFAULT 0,
+    last_active DATE
+);
+
 -- Grant specific privileges to webserver user
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO webserver;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO webserver;
