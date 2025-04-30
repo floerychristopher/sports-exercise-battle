@@ -87,25 +87,49 @@ public class UserRepository {
     public String createAuthToken(int userId, String username) throws SQLException {
         // Generate token in the format "username-sebToken"
         String token = username + "-sebToken";
-        String sql = "INSERT INTO auth_tokens (user_id, token) VALUES (?, ?)";
 
         Connection conn = null;
-        PreparedStatement stmt = null;
+        PreparedStatement checkStmt = null;
+        PreparedStatement deleteStmt = null;
+        PreparedStatement insertStmt = null;
+        ResultSet rs = null;
 
         try {
             conn = dbConfig.getConnection();
-            stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, userId);
-            stmt.setString(2, token);
 
-            int rowsAffected = stmt.executeUpdate();
+            // Check if token already exists
+            String checkSQL = "SELECT token FROM auth_tokens WHERE user_id = ? OR token = ?";
+            checkStmt = conn.prepareStatement(checkSQL);
+            checkStmt.setInt(1, userId);
+            checkStmt.setString(2, token);
+            rs = checkStmt.executeQuery();
+
+            // If token exists, delete it
+            if (rs.next()) {
+                String deleteSql = "DELETE FROM auth_tokens WHERE user_id = ? OR token = ?";
+                deleteStmt = conn.prepareStatement(deleteSql);
+                deleteStmt.setInt(1, userId);
+                deleteStmt.setString(2, token);
+                deleteStmt.executeUpdate();
+            }
+
+            // Insert new token
+            String insertSql = "INSERT INTO auth_tokens (user_id, token) VALUES (?, ?)";
+            insertStmt = conn.prepareStatement(insertSql);
+            insertStmt.setInt(1, userId);
+            insertStmt.setString(2, token);
+
+            int rowsAffected = insertStmt.executeUpdate();
             if (rowsAffected == 1) {
                 return token;
             } else {
                 throw new SQLException("Failed to create auth token");
             }
         } finally {
-            if (stmt != null) stmt.close();
+            if (rs != null) rs.close();
+            if (checkStmt != null) checkStmt.close();
+            if (deleteStmt != null) deleteStmt.close();
+            if (insertStmt != null) insertStmt.close();
             if (conn != null) dbConfig.closeConnection(conn);
         }
     }
