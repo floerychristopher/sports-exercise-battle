@@ -58,9 +58,9 @@ public class ProfileController {
     }
 
     /**
-     * Update user profile
+     * Update user profile with Name, Bio, Image
      */
-    public Map<String, Object> updateProfile(int userId, String displayName) {
+    public Map<String, Object> updateProfile(int userId, String name, String bio, String image) {
         Map<String, Object> response = new HashMap<>();
 
         try {
@@ -73,13 +73,18 @@ public class ProfileController {
                 return response;
             }
 
-            // Update or create profile
-            UserProfile profile = new UserProfile(userId, displayName);
+            // Update or create profile with new fields
+            UserProfile profile = new UserProfile(userId, name);
+            profile.setBio(bio);
+            profile.setImage(image);
+
             userRepository.saveUserProfile(profile);
 
             response.put("success", true);
             response.put("message", "Profile updated successfully");
-            response.put("displayName", displayName);
+            response.put("name", name);
+            response.put("bio", bio);
+            response.put("image", image);
 
         } catch (SQLException e) {
             response.put("success", false);

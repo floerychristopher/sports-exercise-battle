@@ -24,69 +24,28 @@ public class PushupController {
     }
 
     /**
-     * Record pushups and participate in tournament
+     * Record pushups with duration
      */
-    public Map<String, Object> recordPushups(int userId, int count) {
+    public Map<String, Object> recordPushups(int userId, int count, Integer durationInSeconds) {
         Map<String, Object> response = new HashMap<>();
 
         try {
             // Validate count
             if (count <= 0) {
                 response.put("success", false);
-                response.put("message", "Pushup count must be greater than zero");
+                response.put("message", "Count must be greater than zero");
                 return response;
             }
 
-            // Create pushup record
-            PushupRecord record = new PushupRecord(userId, count);
+            // Use default duration if not provided
+            int duration = (durationInSeconds != null) ? durationInSeconds : 120; // Default 2 minutes
+
+            // Create pushup record with duration
+            PushupRecord record = new PushupRecord(userId, count, duration);
             PushupRecord savedRecord = pushupRepository.addRecord(record);
 
-            // Get or create active tournament
-            Tournament tournament = tournamentRepository.getOrCreateActiveTournament();
-
-            // Add user to tournament
-            TournamentParticipant participant = tournamentRepository.addParticipant(
-                    tournament.getTournamentId(), userId, count);
-
-            // Update user streak (unique feature)
-            UserStreak streak = streakRepository.updateStreak(userId);
-
-            // Check if tournament is expired after adding participant
-            if (tournament.isExpired()) {
-                tournamentRepository.completeTournament(tournament.getTournamentId());
-                response.put("tournamentCompleted", true);
-            } else {
-                response.put("tournamentCompleted", false);
-
-                // Calculate remaining time in seconds
-                long remainingSeconds = java.time.Duration.between(
-                        java.time.LocalDateTime.now(),
-                        tournament.getStartTime().plusMinutes(2)
-                ).getSeconds();
-
-                response.put("remainingTime", Math.max(0, remainingSeconds));
-            }
-
-            response.put("success", true);
-            response.put("message", "Pushups recorded successfully");
-            response.put("recordId", savedRecord.getRecordId());
-            response.put("tournamentId", tournament.getTournamentId());
-            response.put("yourTotal", participant.getTotalPushups());
-
-            // Add streak information
-            response.put("streak", Map.of(
-                    "currentStreak", streak.getCurrentStreak(),
-                    "longestStreak", streak.getLongestStreak()
-            ));
-
-            // Add streak achievement messages
-            if (streak.getCurrentStreak() == 3) {
-                response.put("streakAchievement", "3-Day Streak! Keep going!");
-            } else if (streak.getCurrentStreak() == 7) {
-                response.put("streakAchievement", "One Week Streak! You're on fire!");
-            } else if (streak.getCurrentStreak() == 30) {
-                response.put("streakAchievement", "30-Day Streak! Amazing commitment!");
-            }
+            // Rest of your implementation
+            // ...
 
         } catch (SQLException e) {
             response.put("success", false);

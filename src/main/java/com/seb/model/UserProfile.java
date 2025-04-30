@@ -3,6 +3,8 @@ package com.seb.model;
 public class UserProfile {
     private int userId;
     private String displayName;
+    private String bio;
+    private String image;
 
     public UserProfile(int userId, String displayName) {
         this.userId = userId;
@@ -24,5 +26,21 @@ public class UserProfile {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }

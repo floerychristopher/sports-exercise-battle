@@ -6,6 +6,7 @@ public class PushupRecord {
     private int recordId;
     private int userId;
     private int count;
+    private int durationInSeconds;
     private LocalDateTime recordDate;
 
     // Constructor for new records
@@ -54,5 +55,13 @@ public class PushupRecord {
 
     public void setRecordDate(LocalDateTime recordDate) {
         this.recordDate = recordDate;
+    }
+
+    public int getDurationInSeconds() {
+        return durationInSeconds;
+    }
+
+    public void setDurationInSeconds(int durationInSeconds) {
+        this.durationInSeconds = durationInSeconds;
     }
 }

@@ -53,7 +53,9 @@ public class UserController {
         return response;
     }
 
-    // Login
+    /**
+     * Login with updated token format
+     */
     public Map<String, Object> login(String username, String password) {
         Map<String, Object> response = new HashMap<>();
 
@@ -76,8 +78,8 @@ public class UserController {
                 return response;
             }
 
-            // Generate auth token
-            String token = userRepository.createAuthToken(user.getUserId());
+            // Generate auth token with username included for the new format
+            String token = userRepository.createAuthToken(user.getUserId(), username);
 
             response.put("success", true);
             response.put("message", "Login successful");
@@ -102,12 +104,18 @@ public class UserController {
         }
     }
 
-    // Get user ID from token
-    public Optional<Integer> getUserIdFromToken(String token) {
-        try {
-            return userRepository.validateToken(token);
-        } catch (SQLException e) {
-            return Optional.empty();
-        }
+    /**
+     * Get username from token
+     */
+    public String getUsernameFromToken(String authHeader) {
+        return userRepository.getUsernameFromToken(authHeader);
+    }
+
+    /**
+     * Check if user can access profile
+     */
+    public boolean canAccessProfile(String authHeader, String profileUsername) {
+        String tokenUsername = getUsernameFromToken(authHeader);
+        return tokenUsername != null && tokenUsername.equals(profileUsername);
     }
 }

@@ -59,6 +59,13 @@ CREATE TABLE user_streaks (
     last_active DATE
 );
 
+ALTER TABLE user_profiles 
+ADD COLUMN bio VARCHAR(500),
+ADD COLUMN image VARCHAR(500);
+
+ALTER TABLE pushup_records
+ADD COLUMN duration_seconds INTEGER DEFAULT 120;
+
 -- Grant specific privileges to webserver user
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO webserver;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO webserver;

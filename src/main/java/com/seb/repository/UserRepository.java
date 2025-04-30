@@ -81,9 +81,12 @@ public class UserRepository {
         }
     }
 
-    // Create new auth token for user
-    public String createAuthToken(int userId) throws SQLException {
-        String token = generateToken();
+    /**
+     * Create a new authentication token for a user in the format "username-sebToken"
+     */
+    public String createAuthToken(int userId, String username) throws SQLException {
+        // Generate token in the format "username-sebToken"
+        String token = username + "-sebToken";
         String sql = "INSERT INTO auth_tokens (user_id, token) VALUES (?, ?)";
 
         Connection conn = null;
@@ -107,8 +110,16 @@ public class UserRepository {
         }
     }
 
-    // Validate auth token
-    public Optional<Integer> validateToken(String token) throws SQLException {
+    /**
+     * Validate token in the format "Basic username-sebToken"
+     */
+    public Optional<Integer> validateToken(String authHeader) throws SQLException {
+        if (authHeader == null || !authHeader.startsWith("Basic ")) {
+            return Optional.empty();
+        }
+
+        String token = authHeader.substring("Basic ".length());
+
         String sql = "SELECT user_id FROM auth_tokens WHERE token = ?";
 
         Connection conn = null;
@@ -132,6 +143,19 @@ public class UserRepository {
             if (stmt != null) stmt.close();
             if (conn != null) dbConfig.closeConnection(conn);
         }
+    }
+
+    /**
+     * Extract username from token
+     */
+    public String getUsernameFromToken(String authHeader) {
+        if (authHeader != null && authHeader.startsWith("Basic ")) {
+            String token = authHeader.substring("Basic ".length());
+            if (token.contains("-sebToken")) {
+                return token.split("-sebToken")[0];
+            }
+        }
+        return null;
     }
 
     // Generate random token
