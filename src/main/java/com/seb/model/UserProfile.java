@@ -6,9 +6,18 @@ public class UserProfile {
     private String bio;
     private String image;
 
+    // Basic constructor
     public UserProfile(int userId, String displayName) {
         this.userId = userId;
         this.displayName = displayName;
+    }
+
+    // Full constructor
+    public UserProfile(int userId, String displayName, String bio, String image) {
+        this.userId = userId;
+        this.displayName = displayName;
+        this.bio = bio;
+        this.image = image;
     }
 
     // Getters and setters

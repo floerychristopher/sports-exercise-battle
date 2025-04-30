@@ -38,7 +38,7 @@ public class UserController {
             User createdUser = userRepository.createUser(newUser);
 
             // Generate auth token
-            String token = userRepository.createAuthToken(createdUser.getUserId());
+            String token = userRepository.createAuthToken(createdUser.getUserId(), username);
 
             response.put("success", true);
             response.put("message", "User registered successfully");
@@ -53,9 +53,6 @@ public class UserController {
         return response;
     }
 
-    /**
-     * Login with updated token format
-     */
     public Map<String, Object> login(String username, String password) {
         Map<String, Object> response = new HashMap<>();
 
@@ -78,7 +75,7 @@ public class UserController {
                 return response;
             }
 
-            // Generate auth token with username included for the new format
+            // Generate auth token with username for the new format
             String token = userRepository.createAuthToken(user.getUserId(), username);
 
             response.put("success", true);
@@ -105,10 +102,31 @@ public class UserController {
     }
 
     /**
-     * Get username from token
+     * Get user ID from token
+     */
+    public Optional<Integer> getUserIdFromToken(String authHeader) {
+        try {
+            if (authHeader != null && authHeader.startsWith("Basic ")) {
+                String token = authHeader.substring("Basic ".length());
+                return userRepository.validateToken(token);
+            }
+            return Optional.empty();
+        } catch (SQLException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Extract username from auth header
      */
     public String getUsernameFromToken(String authHeader) {
-        return userRepository.getUsernameFromToken(authHeader);
+        if (authHeader != null && authHeader.startsWith("Basic ")) {
+            String token = authHeader.substring("Basic ".length());
+            if (token.contains("-sebToken")) {
+                return token.split("-sebToken")[0];
+            }
+        }
+        return null;
     }
 
     /**

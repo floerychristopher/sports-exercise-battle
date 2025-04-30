@@ -9,18 +9,28 @@ public class PushupRecord {
     private int durationInSeconds;
     private LocalDateTime recordDate;
 
-    // Constructor for new records
+    // Constructor for new records with count only (default duration)
     public PushupRecord(int userId, int count) {
         this.userId = userId;
         this.count = count;
+        this.durationInSeconds = 120; // Default 2 minutes
+        this.recordDate = LocalDateTime.now();
+    }
+
+    // Constructor for new records with count and duration
+    public PushupRecord(int userId, int count, int durationInSeconds) {
+        this.userId = userId;
+        this.count = count;
+        this.durationInSeconds = durationInSeconds;
         this.recordDate = LocalDateTime.now();
     }
 
     // Constructor for existing records
-    public PushupRecord(int recordId, int userId, int count, LocalDateTime recordDate) {
+    public PushupRecord(int recordId, int userId, int count, int durationInSeconds, LocalDateTime recordDate) {
         this.recordId = recordId;
         this.userId = userId;
         this.count = count;
+        this.durationInSeconds = durationInSeconds;
         this.recordDate = recordDate;
     }
 
@@ -49,19 +59,19 @@ public class PushupRecord {
         this.count = count;
     }
 
-    public LocalDateTime getRecordDate() {
-        return recordDate;
-    }
-
-    public void setRecordDate(LocalDateTime recordDate) {
-        this.recordDate = recordDate;
-    }
-
     public int getDurationInSeconds() {
         return durationInSeconds;
     }
 
     public void setDurationInSeconds(int durationInSeconds) {
         this.durationInSeconds = durationInSeconds;
+    }
+
+    public LocalDateTime getRecordDate() {
+        return recordDate;
+    }
+
+    public void setRecordDate(LocalDateTime recordDate) {
+        this.recordDate = recordDate;
     }
 }

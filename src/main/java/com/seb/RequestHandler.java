@@ -160,7 +160,7 @@ public class RequestHandler implements Runnable {
             }
 
             // All other endpoints require authentication
-            if (!path.equals("/register") && !path.equals("/login") && !path.equals("/health")) {
+            if (!path.equals("/users") && !path.equals("/sessions") && !path.equals("/health")) {
                 String authToken = headers.get("authorization");
                 if (authToken == null) {
                     sendResponse(out, 401, "Unauthorized", "application/json",
@@ -168,19 +168,14 @@ public class RequestHandler implements Runnable {
                     return;
                 }
 
-                String username = null;
-                if (authToken.startsWith("Basic ")) {
-                    String token = authToken.substring("Basic ".length());
-                    if(token.contains("-sebToken")) {
-                        username = token.split("-sebToken")[0];
-                    }
-                }
+                // Extract username from token format "Basic username-sebToken"
+                UserController userController = new UserController();
+                String requestingUsername = userController.getUsernameFromToken(authToken);
 
                 // Validate token and get user ID
-                UserController userController = new UserController();
                 Optional<Integer> userIdOpt = userController.getUserIdFromToken(authToken);
 
-                if (!userIdOpt.isPresent()) {
+                if (!userIdOpt.isPresent() || requestingUsername == null) {
                     sendResponse(out, 401, "Unauthorized", "application/json",
                             mapper.writeValueAsString(Map.of("success", false, "message", "Invalid authentication token")));
                     return;
@@ -188,13 +183,13 @@ public class RequestHandler implements Runnable {
 
                 int userId = userIdOpt.get();
 
-                // User profile endpoints: /profile -> /users/{username}
+                // User profile endpoints
                 if (path.startsWith("/users/")) {
                     ProfileController profileController = new ProfileController();
-                    String pathUsername = path.substring("/users/".length());
+                    String profileUsername = path.substring("/users/".length());
 
                     // Security check - users can only access their own profiles
-                    if (!userController.canAccessProfile(username, pathUsername)) {
+                    if (!profileUsername.equals(requestingUsername)) {
                         sendResponse(out, 403, "Forbidden", "application/json",
                                 mapper.writeValueAsString(Map.of("success", false, "message", "You can only access your own profile")));
                         return;

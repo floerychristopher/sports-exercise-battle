@@ -82,7 +82,7 @@ public class UserRepository {
     }
 
     /**
-     * Create a new authentication token for a user in the format "username-sebToken"
+     * Create a new authentication token in the format "username-sebToken"
      */
     public String createAuthToken(int userId, String username) throws SQLException {
         // Generate token in the format "username-sebToken"
@@ -111,15 +111,9 @@ public class UserRepository {
     }
 
     /**
-     * Validate token in the format "Basic username-sebToken"
+     * Validate a token
      */
-    public Optional<Integer> validateToken(String authHeader) throws SQLException {
-        if (authHeader == null || !authHeader.startsWith("Basic ")) {
-            return Optional.empty();
-        }
-
-        String token = authHeader.substring("Basic ".length());
-
+    public Optional<Integer> validateToken(String token) throws SQLException {
         String sql = "SELECT user_id FROM auth_tokens WHERE token = ?";
 
         Connection conn = null;
@@ -167,10 +161,10 @@ public class UserRepository {
     // Add these methods to the UserRepository class
 
     /**
-     * Get user profile
+     * Get user profile with all fields
      */
     public Optional<UserProfile> getUserProfile(int userId) throws SQLException {
-        String sql = "SELECT user_id, display_name FROM user_profiles WHERE user_id = ?";
+        String sql = "SELECT user_id, display_name, bio, image FROM user_profiles WHERE user_id = ?";
 
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -186,7 +180,9 @@ public class UserRepository {
             if (rs.next()) {
                 UserProfile profile = new UserProfile(
                         rs.getInt("user_id"),
-                        rs.getString("display_name")
+                        rs.getString("display_name"),
+                        rs.getString("bio"),
+                        rs.getString("image")
                 );
                 return Optional.of(profile);
             } else {
@@ -200,7 +196,7 @@ public class UserRepository {
     }
 
     /**
-     * Create or update user profile
+     * Create or update user profile with all fields
      */
     public void saveUserProfile(UserProfile profile) throws SQLException {
         // Check if profile exists
@@ -214,16 +210,20 @@ public class UserRepository {
 
             if (existingProfile.isPresent()) {
                 // Update existing profile
-                String sql = "UPDATE user_profiles SET display_name = ? WHERE user_id = ?";
+                String sql = "UPDATE user_profiles SET display_name = ?, bio = ?, image = ? WHERE user_id = ?";
                 stmt = conn.prepareStatement(sql);
                 stmt.setString(1, profile.getDisplayName());
-                stmt.setInt(2, profile.getUserId());
+                stmt.setString(2, profile.getBio());
+                stmt.setString(3, profile.getImage());
+                stmt.setInt(4, profile.getUserId());
             } else {
                 // Create new profile
-                String sql = "INSERT INTO user_profiles (user_id, display_name) VALUES (?, ?)";
+                String sql = "INSERT INTO user_profiles (user_id, display_name, bio, image) VALUES (?, ?, ?, ?)";
                 stmt = conn.prepareStatement(sql);
                 stmt.setInt(1, profile.getUserId());
                 stmt.setString(2, profile.getDisplayName());
+                stmt.setString(3, profile.getBio());
+                stmt.setString(4, profile.getImage());
             }
 
             int rowsAffected = stmt.executeUpdate();
@@ -235,6 +235,7 @@ public class UserRepository {
             if (conn != null) dbConfig.closeConnection(conn);
         }
     }
+
 
     /**
      * Get user by ID

@@ -18,10 +18,10 @@ public class PushupRepository {
     }
 
     /**
-     * Add a new pushup record
+     * Add a new pushup record with duration
      */
     public PushupRecord addRecord(PushupRecord record) throws SQLException {
-        String sql = "INSERT INTO pushup_records (user_id, count, record_date) VALUES (?, ?, ?) RETURNING record_id";
+        String sql = "INSERT INTO pushup_records (user_id, count, duration_seconds, record_date) VALUES (?, ?, ?, ?) RETURNING record_id";
 
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -32,7 +32,8 @@ public class PushupRepository {
             stmt = conn.prepareStatement(sql);
             stmt.setInt(1, record.getUserId());
             stmt.setInt(2, record.getCount());
-            stmt.setTimestamp(3, Timestamp.valueOf(record.getRecordDate()));
+            stmt.setInt(3, record.getDurationInSeconds());
+            stmt.setTimestamp(4, Timestamp.valueOf(record.getRecordDate()));
 
             rs = stmt.executeQuery();
 
@@ -50,13 +51,13 @@ public class PushupRepository {
     }
 
     /**
-     * Get pushup history for a user
+     * Get pushup history for a user with duration
      */
-    public List<PushupRecord> getUserHistory(int userId) throws SQLException {
-        String sql = "SELECT record_id, user_id, count, record_date FROM pushup_records " +
+    public List<Map<String, Object>> getUserHistory(int userId) throws SQLException {
+        String sql = "SELECT record_id, user_id, count, duration_seconds, record_date FROM pushup_records " +
                 "WHERE user_id = ? ORDER BY record_date DESC";
 
-        List<PushupRecord> records = new ArrayList<>();
+        List<Map<String, Object>> records = new ArrayList<>();
 
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -70,12 +71,13 @@ public class PushupRepository {
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                PushupRecord record = new PushupRecord(
-                        rs.getInt("record_id"),
-                        rs.getInt("user_id"),
-                        rs.getInt("count"),
-                        rs.getTimestamp("record_date").toLocalDateTime()
-                );
+                Map<String, Object> record = new HashMap<>();
+                record.put("recordId", rs.getInt("record_id"));
+                record.put("Name", "PushUps"); // Hardcoded name as per curl script
+                record.put("Count", rs.getInt("count"));
+                record.put("DurationInSeconds", rs.getInt("duration_seconds"));
+                record.put("recordDate", rs.getTimestamp("record_date").toLocalDateTime());
+
                 records.add(record);
             }
 
