@@ -1,5 +1,6 @@
 package com.seb;
 
+import com.seb.controller.StreakController;
 import com.seb.controller.ProfileController;
 import com.seb.controller.PushupController;
 import com.seb.controller.TournamentController;
@@ -277,6 +278,29 @@ public class RequestHandler implements Runnable {
                     if (method.equals("GET")) {
                         // Get recent tournaments (default 10)
                         Map<String, Object> result = tournamentController.getRecentTournaments(10);
+                        sendResponse(out, 200, "OK", "application/json", mapper.writeValueAsString(result));
+                        return;
+                    }
+                }
+
+                // Streak endpoints - after the tournament endpoints
+                if (path.equals("/streak")) {
+                    StreakController streakController = new StreakController();
+
+                    if (method.equals("GET")) {
+                        // Get user's streak
+                        Map<String, Object> result = streakController.getUserStreak(userId);
+                        sendResponse(out, 200, "OK", "application/json", mapper.writeValueAsString(result));
+                        return;
+                    }
+                }
+
+                if (path.equals("/streak/leaderboard")) {
+                    StreakController streakController = new StreakController();
+
+                    if (method.equals("GET")) {
+                        // Get streak leaderboard
+                        Map<String, Object> result = streakController.getStreakLeaderboard();
                         sendResponse(out, 200, "OK", "application/json", mapper.writeValueAsString(result));
                         return;
                     }

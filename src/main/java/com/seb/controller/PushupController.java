@@ -1,8 +1,10 @@
 package com.seb.controller;
 
+import com.seb.repository.StreakRepository;
 import com.seb.model.PushupRecord;
 import com.seb.model.Tournament;
 import com.seb.model.TournamentParticipant;
+import com.seb.model.UserStreak;
 import com.seb.repository.PushupRepository;
 import com.seb.repository.TournamentRepository;
 
@@ -13,10 +15,12 @@ import java.util.Map;
 public class PushupController {
     private final PushupRepository pushupRepository;
     private final TournamentRepository tournamentRepository;
+    private final StreakRepository streakRepository;
 
     public PushupController() {
         this.pushupRepository = new PushupRepository();
         this.tournamentRepository = new TournamentRepository();
+        this.streakRepository = new StreakRepository();
     }
 
     /**
@@ -44,6 +48,9 @@ public class PushupController {
             TournamentParticipant participant = tournamentRepository.addParticipant(
                     tournament.getTournamentId(), userId, count);
 
+            // Update user streak (unique feature)
+            UserStreak streak = streakRepository.updateStreak(userId);
+
             // Check if tournament is expired after adding participant
             if (tournament.isExpired()) {
                 tournamentRepository.completeTournament(tournament.getTournamentId());
@@ -65,6 +72,21 @@ public class PushupController {
             response.put("recordId", savedRecord.getRecordId());
             response.put("tournamentId", tournament.getTournamentId());
             response.put("yourTotal", participant.getTotalPushups());
+
+            // Add streak information
+            response.put("streak", Map.of(
+                    "currentStreak", streak.getCurrentStreak(),
+                    "longestStreak", streak.getLongestStreak()
+            ));
+
+            // Add streak achievement messages
+            if (streak.getCurrentStreak() == 3) {
+                response.put("streakAchievement", "3-Day Streak! Keep going!");
+            } else if (streak.getCurrentStreak() == 7) {
+                response.put("streakAchievement", "One Week Streak! You're on fire!");
+            } else if (streak.getCurrentStreak() == 30) {
+                response.put("streakAchievement", "30-Day Streak! Amazing commitment!");
+            }
 
         } catch (SQLException e) {
             response.put("success", false);
