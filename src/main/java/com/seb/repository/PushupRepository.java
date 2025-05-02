@@ -4,7 +4,6 @@ import com.seb.config.DatabaseConfig;
 import com.seb.model.PushupRecord;
 
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

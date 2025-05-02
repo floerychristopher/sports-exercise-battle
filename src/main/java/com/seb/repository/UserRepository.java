@@ -169,11 +169,6 @@ public class UserRepository {
         return null;
     }
 
-    // Generate random token
-    private String generateToken() {
-        return java.util.UUID.randomUUID().toString();
-    }
-
     // Get user profile (all fields)
     public Optional<UserProfile> getUserProfile(int userId) throws SQLException {
         String sql = "SELECT user_id, display_name, bio, image FROM user_profiles WHERE user_id = ?";

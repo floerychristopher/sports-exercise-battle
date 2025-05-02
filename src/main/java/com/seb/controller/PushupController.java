@@ -4,7 +4,6 @@ import com.seb.repository.StreakRepository;
 import com.seb.model.PushupRecord;
 import com.seb.model.Tournament;
 import com.seb.model.TournamentParticipant;
-import com.seb.model.UserStreak;
 import com.seb.repository.PushupRepository;
 import com.seb.repository.TournamentRepository;
 
