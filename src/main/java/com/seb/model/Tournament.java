@@ -7,7 +7,7 @@ import java.util.List;
 public class Tournament {
     private int tournamentId;
     private LocalDateTime startTime;
-    private String status; // "ACTIVE" or "COMPLETED"
+    private String status; // ACTIVE or COMPLETED
     private List<TournamentParticipant> participants;
 
     // Constructor for new tournaments
@@ -59,7 +59,7 @@ public class Tournament {
     }
 
     public boolean isExpired() {
-        // A tournament expires after 2 minutes
+        // Tournament expires after 2 minutes
         return LocalDateTime.now().isAfter(startTime.plusMinutes(2));
     }
 }

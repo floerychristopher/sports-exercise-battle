@@ -15,9 +15,7 @@ public class ProfileController {
         this.userRepository = new UserRepository();
     }
 
-    /**
-     * Get user profile in the curl script format
-     */
+    // Get user profile
     public Map<String, Object> getProfile(int userId) {
         Map<String, Object> response = new HashMap<>();
 
@@ -62,9 +60,7 @@ public class ProfileController {
         return response;
     }
 
-    /**
-     * Update user profile with fields from curl script
-     */
+    // Update user profile
     public Map<String, Object> updateProfile(int userId, String name, String bio, String image) {
         Map<String, Object> response = new HashMap<>();
 
@@ -96,9 +92,7 @@ public class ProfileController {
         return response;
     }
 
-    /**
-     * Get scoreboard
-     */
+    // Get scoreboard
     public Map<String, Object> getScoreboard() {
         Map<String, Object> response = new HashMap<>();
 

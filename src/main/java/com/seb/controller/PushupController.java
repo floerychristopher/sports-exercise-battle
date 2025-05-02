@@ -24,9 +24,7 @@ public class PushupController {
         this.streakRepository = new StreakRepository();
     }
 
-    /**
-     * Record pushups with the curl script format
-     */
+    // Record pushups
     public Map<String, Object> recordPushups(int userId, int count, Integer durationInSeconds) {
         Map<String, Object> response = new HashMap<>();
 
@@ -39,7 +37,7 @@ public class PushupController {
             }
 
             // Use default duration if not provided
-            int duration = (durationInSeconds != null) ? durationInSeconds : 120; // Default 2 minutes
+            int duration = (durationInSeconds != null) ? durationInSeconds : 120;
 
             // Create pushup record with duration
             PushupRecord record = new PushupRecord(userId, count, duration);
@@ -59,7 +57,7 @@ public class PushupController {
             } else {
                 response.put("tournamentCompleted", false);
 
-                // Calculate remaining time in seconds
+                // Calculate time left (seconds)
                 long remainingSeconds = java.time.Duration.between(
                         java.time.LocalDateTime.now(),
                         tournament.getStartTime().plusMinutes(2)
@@ -82,9 +80,7 @@ public class PushupController {
         return response;
     }
 
-    /**
-     * Get user's pushup history in curl script format
-     */
+    // Get user pushup history
     public Map<String, Object> getUserHistory(int userId) {
         Map<String, Object> response = new HashMap<>();
 
@@ -100,9 +96,7 @@ public class PushupController {
         return response;
     }
 
-    /**
-     * Get user's stats
-     */
+    // Get user stats
     public Map<String, Object> getUserStats(int userId) {
         Map<String, Object> response = new HashMap<>();
 

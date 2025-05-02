@@ -11,8 +11,7 @@ public class DatabaseConfig {
     private static final String DB_USER = "webserver";
     private static final String DB_PASSWORD = "webserver";
 
-    // Declaration of static variable "instance" (of type DatabaseConfig)
-    // to store instance of DatabaseConfig
+    // To store instance of DatabaseConfig
     private static DatabaseConfig instance;
 
     // Load PostgreSQL driver in memory
@@ -26,7 +25,7 @@ public class DatabaseConfig {
         }
     }
 
-    // Returns "instance" of type DatabaseConfig
+    // Get DatabaseConfig instance
     // "synchronized" ensures that only one instance of DatabaseConfig exist (Singleton)
     public static synchronized DatabaseConfig getInstance() {
         if (instance == null) {
@@ -66,6 +65,7 @@ public class DatabaseConfig {
         }
     }
 
+    // === Test database connection ===
 
     public static void main(String[] args) {
         DatabaseConfig dbConfig = DatabaseConfig.getInstance();

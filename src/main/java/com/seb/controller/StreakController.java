@@ -15,9 +15,7 @@ public class StreakController {
         this.streakRepository = new StreakRepository();
     }
 
-    /**
-     * Get a user's streak information
-     */
+    // Get user streak info
     public Map<String, Object> getUserStreak(int userId) {
         Map<String, Object> response = new HashMap<>();
 
@@ -45,9 +43,7 @@ public class StreakController {
         return response;
     }
 
-    /**
-     * Get streak leaderboard
-     */
+    // Get streak leaderboard
     public Map<String, Object> getStreakLeaderboard() {
         Map<String, Object> response = new HashMap<>();
 

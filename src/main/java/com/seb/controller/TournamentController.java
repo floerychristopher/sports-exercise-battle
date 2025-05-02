@@ -14,9 +14,7 @@ public class TournamentController {
         this.tournamentRepository = new TournamentRepository();
     }
 
-    /**
-     * Get active tournament or create new one
-     */
+    // Get active tournament/create new tournament
     public Map<String, Object> getActiveTournament() {
         Map<String, Object> response = new HashMap<>();
 
@@ -45,9 +43,7 @@ public class TournamentController {
         return response;
     }
 
-    /**
-     * Get recent tournaments
-     */
+    // Get recent tournaments
     public Map<String, Object> getRecentTournaments(int limit) {
         Map<String, Object> response = new HashMap<>();
 
@@ -62,9 +58,7 @@ public class TournamentController {
         return response;
     }
 
-    /**
-     * Get tournament logs
-     */
+    // Get tournament logs
     public Map<String, Object> getTournamentLogs(int tournamentId) {
         Map<String, Object> response = new HashMap<>();
 

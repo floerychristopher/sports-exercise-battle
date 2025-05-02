@@ -80,7 +80,7 @@ public class RequestHandler implements Runnable {
             // Log the request
             System.out.println("Received " + method + " request for " + path);
 
-            // Route the request to the appropriate handler based on path
+            // Route request to appropriate handler (based on path)
             routeRequest(out, method, path, headers, requestBody.toString());
 
         } catch (IOException e) {
@@ -97,7 +97,7 @@ public class RequestHandler implements Runnable {
     private void routeRequest(PrintWriter out, String method, String path, Map<String, String> headers, String body) {
 
         try {
-            // Health check endpoint
+            // * TEST * Health check endpoint
             if (path.equals("/health")) {
                 sendResponse(out, 200, "OK", "application/json", "{\"status\":\"up\"}");
                 return;
@@ -168,7 +168,7 @@ public class RequestHandler implements Runnable {
                     return;
                 }
 
-                // Extract username from token format "Basic username-sebToken"
+                // Extract username from token
                 UserController userController = new UserController();
                 String requestingUsername = userController.getUsernameFromToken(authToken);
 
@@ -188,7 +188,7 @@ public class RequestHandler implements Runnable {
                     ProfileController profileController = new ProfileController();
                     String profileUsername = path.substring("/users/".length());
 
-                    // Security check - users can only access their own profiles
+                    // Security check (so users can only access their own profiles)
                     if (!profileUsername.equals(requestingUsername)) {
                         sendResponse(out, 403, "Forbidden", "application/json",
                                 mapper.writeValueAsString(Map.of("success", false, "message", "You can only access your own profile")));
@@ -204,7 +204,7 @@ public class RequestHandler implements Runnable {
                         // Update profile
                         Map<String, String> requestData = mapper.readValue(body, Map.class);
 
-                        // Extract Name, Bio, Image as per curl script
+                        // Extract Name, Bio, Image
                         String name = requestData.get("Name");
                         String bio = requestData.get("Bio");
                         String image = requestData.get("Image");
@@ -215,7 +215,7 @@ public class RequestHandler implements Runnable {
                     }
                 }
 
-                // Stats endpoint: /stats -> /stats (unchanged path)
+                // Stats endpoint
                 if (path.equals("/stats")) {
                     PushupController pushupController = new PushupController();
 
@@ -226,7 +226,7 @@ public class RequestHandler implements Runnable {
                     }
                 }
 
-                // Scoreboard endpoint: /scoreboard -> /score
+                // Scoreboard endpoint
                 if (path.equals("/score")) {
                     ProfileController profileController = new ProfileController();
 
@@ -237,7 +237,7 @@ public class RequestHandler implements Runnable {
                     }
                 }
 
-                // Pushup history: /pushups/history -> /history
+                // Pushup history
                 if (path.equals("/history")) {
                     PushupController pushupController = new PushupController();
 
@@ -247,10 +247,10 @@ public class RequestHandler implements Runnable {
                         sendResponse(out, 200, "OK", "application/json", mapper.writeValueAsString(result));
                         return;
                     } else if (method.equals("POST")) {
-                        // Record pushups - with updated fields from curl
+                        // Record pushups
                         Map<String, Object> requestData = mapper.readValue(body, Map.class);
 
-                        // Extract fields as per curl script
+                        // Extract fields
                         String name = (String) requestData.get("Name");
                         Integer count = (Integer) requestData.get("Count");
                         Integer durationInSeconds = (Integer) requestData.get("DurationInSeconds");
@@ -267,7 +267,7 @@ public class RequestHandler implements Runnable {
                     }
                 }
 
-                // Tournament endpoint: /tournaments -> /tournament
+                // Tournament endpoint
                 if (path.equals("/tournament")) {
                     TournamentController tournamentController = new TournamentController();
 
@@ -278,15 +278,9 @@ public class RequestHandler implements Runnable {
                         return;
                     }
                 }
-
-                // Other tournament endpoints should be updated similarly
-                if (path.equals("/tournaments/recent")) {
-                    // Update to match curl if needed
-                    // ...
-                }
             }
 
-            // If we get here, the endpoint wasn't found
+            // Endpoint wasnt found
             sendResponse(out, 404, "Not Found", "application/json",
                     mapper.writeValueAsString(Map.of("success", false, "message", "Endpoint not found")));
 
@@ -304,7 +298,7 @@ public class RequestHandler implements Runnable {
         out.println("HTTP/1.1 " + statusCode + " " + statusText);
         out.println("Content-Type: " + contentType);
         out.println("Content-Length: " + body.length());
-        out.println(); // Empty line separating headers from body
+        out.println(); // Separating headers from body
         out.println(body);
         out.flush();
     }

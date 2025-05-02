@@ -53,6 +53,7 @@ public class UserController {
         return response;
     }
 
+    // Login
     public Map<String, Object> login(String username, String password) {
         Map<String, Object> response = new HashMap<>();
 
@@ -75,7 +76,7 @@ public class UserController {
                 return response;
             }
 
-            // Generate auth token with username for the new format
+            // Generate auth token with username
             String token = userRepository.createAuthToken(user.getUserId(), username);
 
             response.put("success", true);
@@ -101,9 +102,7 @@ public class UserController {
         }
     }
 
-    /**
-     * Get user ID from token
-     */
+    // Get user ID from token
     public Optional<Integer> getUserIdFromToken(String authHeader) {
         try {
             if (authHeader != null && authHeader.startsWith("Basic ")) {
@@ -116,9 +115,7 @@ public class UserController {
         }
     }
 
-    /**
-     * Extract username from auth header
-     */
+    // Extract username from auth header
     public String getUsernameFromToken(String authHeader) {
         if (authHeader != null && authHeader.startsWith("Basic ")) {
             String token = authHeader.substring("Basic ".length());
@@ -129,9 +126,7 @@ public class UserController {
         return null;
     }
 
-    /**
-     * Check if user can access profile
-     */
+    // Check if user can access profile
     public boolean canAccessProfile(String authHeader, String profileUsername) {
         String tokenUsername = getUsernameFromToken(authHeader);
         return tokenUsername != null && tokenUsername.equals(profileUsername);

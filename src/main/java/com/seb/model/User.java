@@ -13,7 +13,7 @@ public class User {
     public User(String username, String passwordHash) {
         this.username = username;
         this.passwordHash = passwordHash;
-        this.elo = 1000; // Default ELO
+        this.elo = 1000; // Default
         this.creationDate = LocalDateTime.now();
     }
 

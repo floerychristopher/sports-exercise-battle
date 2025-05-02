@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 public class UserRepository {
-    // Reference to DatabaseConfig
     private final DatabaseConfig dbConfig;
 
     public UserRepository() {
@@ -81,11 +80,9 @@ public class UserRepository {
         }
     }
 
-    /**
-     * Create a new authentication token in the format "username-sebToken"
-     */
+    // Create auth token
     public String createAuthToken(int userId, String username) throws SQLException {
-        // Generate token in the format "username-sebToken"
+
         String token = username + "-sebToken";
 
         Connection conn = null;
@@ -134,9 +131,7 @@ public class UserRepository {
         }
     }
 
-    /**
-     * Validate a token
-     */
+    // Validate token
     public Optional<Integer> validateToken(String token) throws SQLException {
         String sql = "SELECT user_id FROM auth_tokens WHERE token = ?";
 
@@ -163,9 +158,7 @@ public class UserRepository {
         }
     }
 
-    /**
-     * Extract username from token
-     */
+    // Extract username of token
     public String getUsernameFromToken(String authHeader) {
         if (authHeader != null && authHeader.startsWith("Basic ")) {
             String token = authHeader.substring("Basic ".length());
@@ -181,12 +174,7 @@ public class UserRepository {
         return java.util.UUID.randomUUID().toString();
     }
 
-
-    // Add these methods to the UserRepository class
-
-    /**
-     * Get user profile with all fields
-     */
+    // Get user profile (all fields)
     public Optional<UserProfile> getUserProfile(int userId) throws SQLException {
         String sql = "SELECT user_id, display_name, bio, image FROM user_profiles WHERE user_id = ?";
 
@@ -219,9 +207,7 @@ public class UserRepository {
         }
     }
 
-    /**
-     * Create or update user profile with all fields
-     */
+    // Create/update user profile (all fields)
     public void saveUserProfile(UserProfile profile) throws SQLException {
         // Check if profile exists
         Optional<UserProfile> existingProfile = getUserProfile(profile.getUserId());
@@ -260,10 +246,6 @@ public class UserRepository {
         }
     }
 
-
-    /**
-     * Get user by ID
-     */
     public Optional<User> findById(int userId) throws SQLException {
         String sql = "SELECT user_id, username, password_hash, elo, creation_date FROM users WHERE user_id = ?";
 
@@ -297,9 +279,6 @@ public class UserRepository {
         }
     }
 
-    /**
-     * Update user's ELO
-     */
     public void updateElo(int userId, int newElo) throws SQLException {
         String sql = "UPDATE users SET elo = ? WHERE user_id = ?";
 
@@ -322,9 +301,7 @@ public class UserRepository {
         }
     }
 
-    /**
-     * Get all users for scoreboard
-     */
+    // Get all users for scoreboard
     public List<Map<String, Object>> getScoreboard() throws SQLException {
         String sql = "SELECT u.user_id, u.username, u.elo, " +
                 "(SELECT COUNT(*) FROM pushup_records pr WHERE pr.user_id = u.user_id) as total_entries, " +

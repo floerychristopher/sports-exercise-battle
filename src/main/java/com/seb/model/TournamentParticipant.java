@@ -4,7 +4,7 @@ public class TournamentParticipant {
     private int tournamentId;
     private int userId;
     private int totalPushups;
-    private String username; // For display purposes
+    private String username; // For display
 
     public TournamentParticipant(int tournamentId, int userId, int totalPushups) {
         this.tournamentId = tournamentId;

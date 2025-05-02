@@ -18,9 +18,7 @@ public class TournamentRepository {
         this.dbConfig = DatabaseConfig.getInstance();
     }
 
-    /**
-     * Create a new tournament
-     */
+    // Create new tournament
     public Tournament createTournament() throws SQLException {
         String sql = "INSERT INTO tournaments (start_time, status) VALUES (?, ?) RETURNING tournament_id";
 
@@ -51,11 +49,9 @@ public class TournamentRepository {
         }
     }
 
-    /**
-     * Get active tournament or create new one
-     */
+    // Get active tournament/create new one
     public Tournament getOrCreateActiveTournament() throws SQLException {
-        // First, try to find an active tournament
+        // Try to find active tournament
         String sql = "SELECT tournament_id, start_time, status FROM tournaments " +
                 "WHERE status = 'ACTIVE' ORDER BY start_time DESC LIMIT 1";
 
@@ -78,7 +74,7 @@ public class TournamentRepository {
 
                 // Check if tournament is expired
                 if (tournament.isExpired()) {
-                    // Complete the tournament and create a new one
+                    // Complete tournament and create a new one
                     completeTournament(tournament.getTournamentId());
                     return createTournament();
                 }
@@ -87,7 +83,7 @@ public class TournamentRepository {
                 loadTournamentParticipants(tournament);
                 return tournament;
             } else {
-                // No active tournament, create new one
+                // No active tournament -> create new one
                 return createTournament();
             }
         } finally {
@@ -97,11 +93,9 @@ public class TournamentRepository {
         }
     }
 
-    /**
-     * Add participant to tournament
-     */
+    // Add participant to tournament
     public TournamentParticipant addParticipant(int tournamentId, int userId, int pushupCount) throws SQLException {
-        // First check if user is already a participant
+        // Check if user is already a participant
         String checkSql = "SELECT total_pushups FROM tournament_participants WHERE tournament_id = ? AND user_id = ?";
 
         Connection conn = null;
@@ -117,7 +111,7 @@ public class TournamentRepository {
             checkRs = checkStmt.executeQuery();
 
             if (checkRs.next()) {
-                // User already exists, update pushup count
+                // User already exists -> update pushup count
                 int currentTotal = checkRs.getInt("total_pushups");
                 int newTotal = currentTotal + pushupCount;
 
@@ -139,7 +133,7 @@ public class TournamentRepository {
                     return new TournamentParticipant(tournamentId, userId, newTotal, username);
                 }
             } else {
-                // New participant, insert record
+                // New participant -> insert record
                 String insertSql = "INSERT INTO tournament_participants (tournament_id, user_id, total_pushups) " +
                         "VALUES (?, ?, ?)";
 
@@ -165,9 +159,7 @@ public class TournamentRepository {
         }
     }
 
-    /**
-     * Complete a tournament and update ELO scores
-     */
+    // Complete tournament (and update elo)
     public void completeTournament(int tournamentId) throws SQLException {
         Connection conn = null;
 
@@ -176,7 +168,7 @@ public class TournamentRepository {
             // Set autocommit to false for transaction
             conn.setAutoCommit(false);
 
-            // First, mark tournament as completed
+            // Mark tournament as completed
             String updateTournamentSql = "UPDATE tournaments SET status = 'COMPLETED' WHERE tournament_id = ?";
             try (PreparedStatement stmt = conn.prepareStatement(updateTournamentSql)) {
                 stmt.setInt(1, tournamentId);
@@ -205,7 +197,7 @@ public class TournamentRepository {
                 }
             }
 
-            // If there are participants, update ELO scores
+            // If there are participants -> update ELO scores
             if (!participants.isEmpty()) {
                 // Determine winners (highest pushup count)
                 int highestCount = participants.get(0).getTotalPushups();
@@ -224,8 +216,8 @@ public class TournamentRepository {
                     int eloChange;
 
                     if (winnerIds.contains(userId)) {
-                        // Winner(s)
-                        eloChange = winnerIds.size() == 1 ? 2 : 1; // +2 for single winner, +1 for tie
+                        // Winners
+                        eloChange = winnerIds.size() == 1 ? 2 : 1; // +2 for one winner and +1 for tie
                     } else {
                         // Losers
                         eloChange = -1;
@@ -293,9 +285,7 @@ public class TournamentRepository {
         }
     }
 
-    /**
-     * Load tournament participants
-     */
+    // Load tournament participants
     private void loadTournamentParticipants(Tournament tournament) throws SQLException {
         String sql = "SELECT tp.tournament_id, tp.user_id, tp.total_pushups, u.username " +
                 "FROM tournament_participants tp " +
@@ -330,9 +320,7 @@ public class TournamentRepository {
         }
     }
 
-    /**
-     * Get username by user ID
-     */
+    // Get username by user ID
     private String getUsernameById(Connection conn, int userId) throws SQLException {
         String sql = "SELECT username FROM users WHERE user_id = ?";
 
@@ -349,9 +337,7 @@ public class TournamentRepository {
         }
     }
 
-    /**
-     * Get current ELO for user
-     */
+    // Get current elo of user
     private int getCurrentElo(Connection conn, int userId) throws SQLException {
         String sql = "SELECT elo FROM users WHERE user_id = ?";
 
@@ -368,9 +354,7 @@ public class TournamentRepository {
         }
     }
 
-    /**
-     * Update user ELO
-     */
+    // Update elo of user
     private void updateElo(Connection conn, int userId, int newElo) throws SQLException {
         String sql = "UPDATE users SET elo = ? WHERE user_id = ?";
 
@@ -381,9 +365,7 @@ public class TournamentRepository {
         }
     }
 
-    /**
-     * Add log entry
-     */
+    // Add log entry
     private void addLogEntry(Connection conn, int tournamentId, String message) throws SQLException {
         String sql = "INSERT INTO logs (tournament_id, message) VALUES (?, ?)";
 
@@ -430,9 +412,7 @@ public class TournamentRepository {
         }
     }
 
-    /**
-     * Get recent tournaments
-     */
+    // Get recent tournaments
     public List<Map<String, Object>> getRecentTournaments(int limit) throws SQLException {
         String sql = "SELECT t.tournament_id, t.start_time, t.status, " +
                 "(SELECT COUNT(*) FROM tournament_participants tp WHERE tp.tournament_id = t.tournament_id) as participant_count " +
@@ -460,7 +440,7 @@ public class TournamentRepository {
                 tournament.put("status", rs.getString("status"));
                 tournament.put("participantCount", rs.getInt("participant_count"));
 
-                // Get tournament winner(s)
+                // Get tournament winners
                 if ("COMPLETED".equals(rs.getString("status"))) {
                     tournament.put("winners", getTournamentWinners(conn, tournamentId));
                 }
@@ -476,9 +456,7 @@ public class TournamentRepository {
         }
     }
 
-    /**
-     * Get tournament winners
-     */
+    // Get tournament winners
     private List<Map<String, Object>> getTournamentWinners(Connection conn, int tournamentId) throws SQLException {
         String sql = "SELECT tp.user_id, u.username, tp.total_pushups " +
                 "FROM tournament_participants tp " +

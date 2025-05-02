@@ -13,7 +13,7 @@ public class PushupRecord {
     public PushupRecord(int userId, int count) {
         this.userId = userId;
         this.count = count;
-        this.durationInSeconds = 120; // Default 2 minutes
+        this.durationInSeconds = 120; // Default
         this.recordDate = LocalDateTime.now();
     }
 

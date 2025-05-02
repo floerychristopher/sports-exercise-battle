@@ -12,12 +12,11 @@ public class Server {
     private boolean running;
 
     public Server() {
-        // Create thread pool for handling client connections
+        // Thread pool for handling client connections
         this.threadPool = Executors.newFixedThreadPool(10);
         this.running = false;
     }
 
-    //
     public void start() {
         running = true;
         ServerSocket serverSocket = null;
@@ -27,15 +26,15 @@ public class Server {
             serverSocket = new ServerSocket(PORT);
             System.out.println("SEB Server started on port " + PORT);
 
-            // Test database connection
+            // Test DB connection
             if (com.seb.config.DatabaseConfig.getInstance().testConnection()) {
                 System.out.println("Database connection successful!");
             } else {
                 System.err.println("WARNING: Database connection failed!");
-                // exit ?
+                System.exit(1);
             }
 
-            // Loop to accept client connections
+            // Loop for accepting client connections
             while (running) {
                 try {
                     Socket clientSocket = serverSocket.accept();
@@ -51,6 +50,7 @@ public class Server {
             System.err.println("Could not start server on port " + PORT);
             e.printStackTrace();
         } finally {
+            System.out.println("SEB Server shutting down...");
             stop(serverSocket);
         }
     }

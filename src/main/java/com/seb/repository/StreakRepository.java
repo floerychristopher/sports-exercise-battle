@@ -15,9 +15,7 @@ public class StreakRepository {
         this.dbConfig = DatabaseConfig.getInstance();
     }
 
-    /**
-     * Get a user's streak information
-     */
+    // Get user streak info
     public Optional<UserStreak> getUserStreak(int userId) throws SQLException {
         String sql = "SELECT user_id, current_streak, longest_streak, last_active FROM user_streaks WHERE user_id = ?";
 
@@ -50,11 +48,9 @@ public class StreakRepository {
         }
     }
 
-    /**
-     * Update user streak when they record a pushup session
-     */
+    // Update user streak when they record a pushup session
     public UserStreak updateStreak(int userId) throws SQLException {
-        // Get current date
+
         LocalDate today = LocalDate.now();
 
         // Get or create user streak
@@ -70,10 +66,10 @@ public class StreakRepository {
                 streak.setCurrentStreak(1);
                 streak.setLongestStreak(1);
             } else if (streak.getLastActive().equals(today)) {
-                // Already recorded today, streak stays the same
+                // Already recorded today (streak stays the same)
                 // Do nothing
             } else if (streak.getLastActive().equals(today.minusDays(1))) {
-                // Recorded yesterday, increment streak
+                // Recorded yesterday (increment streak)
                 streak.setCurrentStreak(streak.getCurrentStreak() + 1);
 
                 // Update longest streak if needed
@@ -99,9 +95,7 @@ public class StreakRepository {
         return streak;
     }
 
-    /**
-     * Create a new streak entry in the database
-     */
+    // Create new streak entry in DB
     private void createStreakInDb(UserStreak streak) throws SQLException {
         String sql = "INSERT INTO user_streaks (user_id, current_streak, longest_streak, last_active) VALUES (?, ?, ?, ?)";
 
@@ -126,9 +120,7 @@ public class StreakRepository {
         }
     }
 
-    /**
-     * Update an existing streak entry in the database
-     */
+    // Update existing streak entry in DB
     private void updateStreakInDb(UserStreak streak) throws SQLException {
         String sql = "UPDATE user_streaks SET current_streak = ?, longest_streak = ?, last_active = ? WHERE user_id = ?";
 
@@ -153,9 +145,7 @@ public class StreakRepository {
         }
     }
 
-    /**
-     * Get streaks for all users (for leaderboard)
-     */
+    // Get streaks of all users (for scoreboard)
     public Map<String, Object> getStreakLeaderboard() throws SQLException {
         String sql = "SELECT us.user_id, u.username, us.current_streak, us.longest_streak, us.last_active " +
                 "FROM user_streaks us " +
@@ -188,11 +178,11 @@ public class StreakRepository {
                 currentStreaks.add(streakInfo);
             }
 
-            // Re-sort for longest streaks
+            // Sort for longest streaks
             currentStreaks.sort((a, b) ->
                     Integer.compare((Integer)b.get("longestStreak"), (Integer)a.get("longestStreak")));
 
-            // Create a copy for longest streaks leaderboard
+            // Create copy for longest streaks leaderboard
             for (Map<String, Object> streak : currentStreaks) {
                 longestStreaks.add(new HashMap<>(streak));
             }

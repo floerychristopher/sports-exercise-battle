@@ -17,9 +17,7 @@ public class PushupRepository {
         this.dbConfig = DatabaseConfig.getInstance();
     }
 
-    /**
-     * Add a new pushup record with duration
-     */
+    // Add new pushup record (with duration)
     public PushupRecord addRecord(PushupRecord record) throws SQLException {
         String sql = "INSERT INTO pushup_records (user_id, count, duration_seconds, record_date) VALUES (?, ?, ?, ?) RETURNING record_id";
 
@@ -50,9 +48,7 @@ public class PushupRepository {
         }
     }
 
-    /**
-     * Get pushup history for a user with duration
-     */
+    // Get pushup history of user (with duration)
     public List<Map<String, Object>> getUserHistory(int userId) throws SQLException {
         String sql = "SELECT record_id, user_id, count, duration_seconds, record_date FROM pushup_records " +
                 "WHERE user_id = ? ORDER BY record_date DESC";
@@ -73,7 +69,7 @@ public class PushupRepository {
             while (rs.next()) {
                 Map<String, Object> record = new HashMap<>();
                 record.put("recordId", rs.getInt("record_id"));
-                record.put("Name", "PushUps"); // Hardcoded name as per curl script
+                record.put("Name", "PushUps");
                 record.put("Count", rs.getInt("count"));
                 record.put("DurationInSeconds", rs.getInt("duration_seconds"));
                 record.put("recordDate", rs.getTimestamp("record_date").toLocalDateTime());
@@ -89,9 +85,7 @@ public class PushupRepository {
         }
     }
 
-    /**
-     * Get user's stats (total pushups, average, best record)
-     */
+    // Get user stats (total pushups, average, best record)
     public Map<String, Object> getUserStats(int userId) throws SQLException {
         String sql = "SELECT COUNT(*) as entry_count, " +
                 "COALESCE(SUM(count), 0) as total_pushups, " +
